@@ -1,6 +1,19 @@
-# Utilities for Object Cache Pro
+# Utilities
 
-1. Migrate from `redis-cache-pro` to `object-cache-pro`
-2. Download script to S3
-3. Pass a verison number to shell script to update to
-4. Run update safely (with rollback)
+## Object Cache Pro
+
+### Installation
+
+...
+
+### Update
+
+Update Object Cache Pro must-use plugin installation.
+
+```
+./update.sh \
+  --version=1.14.4 \
+  --token=... \
+  --source=/home/code \
+  --wp=/home/master/applications/<APP>/public_html
+```
