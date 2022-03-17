@@ -111,16 +111,39 @@ echo "Unpacking archive..."
 unzip -q $tmpdir/object-cache-pro.zip -d $tmpdir
 rm $tmpdir/object-cache-pro.zip
 
-# Atomic release
-# `mv -f $tmpdir/object-cache-pro $src/object-cache-pro`
-# TODO: symlink $dest and $src (nuke if directory)
-# `rm $mudir/redis-cache-pro.php` (migration) 
-# `cp $src/object-cache-pro/stubs/mu-plugin.php $mudir/object-cache-pro.php`
-# (if active) `$wpcli redis enable --skip-flush --skip-flush-notice`
+exit 0
+
+echo "Starting update..."
+
+echo "Moving plugin directory..."
+mv -f $tmpdir/object-cache-pro $src/object-cache-pro
+
+if [ -d "$mudir/object-cache-pro" ]; then
+  echo "Deleting old must-use plugin directory..."
+  mv $mudir/object-cache-pro $tmpdir/$RANDOM
+fi
+
+echo "Linking must-use plugin directory..."
+ln -sfn $src/object-cache-pro $mudir/object-cache-pro
+
+if [ -f "$mudir/redis-cache-pro.php" ]; then
+  echo "Deleting old must-use plugin stub..."
+  rm $mudir/redis-cache-pro.php
+fi
+
+echo "Updating must-use plugin stub..."
+cp -f $src/object-cache-pro/stubs/mu-plugin.php $mudir/object-cache-pro.php
+
+if [ "$dropin" != "1" ]; then
+  echo "Updating object cache drop-in..."
+  $wpcli redis enable --force --skip-flush --skip-flush-notice --skip-plugins --skip-themes --path=$wp
+else
+  echo "Skipping object cache drop-in."
+fi
 
 echo "Resetting opcode cache..."
 $wpcli eval 'opcache_reset();' --skip-plugins --skip-themes --path=$wp
 
-# `rm -rf $dest/redis-cache-pro` (migration)
+echo "Completed update."
 
 echo "Done."
