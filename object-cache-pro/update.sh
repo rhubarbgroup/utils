@@ -55,7 +55,7 @@ fi
 
 if [ -z "$version" ]; then
   version="stable"
-  echo -e "${LOGERR} No version specified, defaulting to latest stable."
+  echo -e "${LOGINF} No version specified, defaulting to latest stable."
 fi
 
 echo "Updating Object Cache Pro must-use installation..."
