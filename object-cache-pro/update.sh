@@ -66,7 +66,7 @@ echo "> Version: ${version}"
 
 if [ ! -d "$src" ]; then
   echo "Creating source directory..."
-  mkdir -p $src
+  mkdir -p "$src"
 fi
 
 if [ ! -w "$src" ]; then
@@ -81,7 +81,7 @@ fi
 
 echo "Preparing for update..."
 
-mudir=$($wpcli eval 'echo WPMU_PLUGIN_DIR;' --skip-plugins --skip-themes --path=$wp)
+mudir=$($wpcli eval 'echo WPMU_PLUGIN_DIR;' --skip-plugins --skip-themes --path="$wp")
 echo "Detected must-use plugin directory: ${mudir}"
 
 if [ ! -w "$mudir" ]; then
@@ -99,7 +99,7 @@ diagnostics=$(cat <<\END
 END
 )
 
-dropin=$($wpcli eval "${diagnostics}" --skip-plugins --skip-themes --path=$wp)
+dropin=$($wpcli eval "${diagnostics}" --skip-plugins --skip-themes --path="$wp")
 
 if [ "$dropin" != "1" ]; then
   echo "Detected valid object cache drop-in"
@@ -122,54 +122,54 @@ curl "https://objectcache.pro/plugin/object-cache-pro${version}.zip?token=${toke
   --silent \
   --show-error \
   --location \
-  --output $tmpdir/object-cache-pro.zip
+  --output "$tmpdir/object-cache-pro.zip"
 
 echo "Unpacking archive..."
 
-unzip -q $tmpdir/object-cache-pro.zip -d $tmpdir
-rm $tmpdir/object-cache-pro.zip
 
 exit 0
+unzip -q "$tmpdir/object-cache-pro.zip" -d "$tmpdir"
+rm "$tmpdir/object-cache-pro.zip"
 
 echo "Starting update..."
 
 echo "Moving plugin directory..."
-mv -f $tmpdir/object-cache-pro $src/object-cache-pro
+mv -f "$tmpdir/object-cache-pro" "$src/object-cache-pro"
 
 if [ -d "$mudir/object-cache-pro" ]; then
   echo "Deleting old must-use plugin directory..."
-  mv $mudir/object-cache-pro $tmpdir/$RANDOM
+  mv "$mudir/object-cache-pro" "$tmpdir/$RANDOM"
 fi
 
 echo "Linking must-use plugin directory..."
-ln -sfn $src/object-cache-pro $mudir/object-cache-pro
+ln -sfn "$src/object-cache-pro" "$mudir/object-cache-pro"
 
 if [ -f "$mudir/redis-cache-pro.php" ]; then
   echo "Deleting old must-use plugin stub..."
-  rm $mudir/redis-cache-pro.php
+  rm "$mudir/redis-cache-pro.php"
 fi
 
 echo "Updating must-use plugin stub..."
-cp -f $src/object-cache-pro/stubs/mu-plugin.php $mudir/object-cache-pro.php
+cp -f "$src/object-cache-pro/stubs/mu-plugin.php" "$mudir/object-cache-pro.php"
 
 if [ "$dropin" != "1" ]; then
   echo "Updating object cache drop-in..."
-  $wpcli redis enable --force --skip-flush --skip-flush-notice --skip-plugins --skip-themes --path=$wp
+  $wpcli redis enable --force --skip-flush --skip-flush-notice --skip-plugins --skip-themes --path="$wp"
 else
   echo "Skipping object cache drop-in."
 fi
 
 echo "Resetting opcode cache..."
-$wpcli eval 'opcache_reset();' --skip-plugins --skip-themes --path=$wp
+$wpcli eval 'opcache_reset();' --skip-plugins --skip-themes --path="$wp"
 
 echo "Completed update."
 
 if [ -d "$mudir/redis-cache-pro" ]; then
   echo "Deleting old must-use plugin files..."
-  rm -rf $mudir/redis-cache-pro
+  rm -rf "$mudir/redis-cache-pro"
 fi
 
 echo "Deleting temporay files..."
-rm -rf $tmpdir
+rm -rf "$tmpdir"
 
 echo "Done."
