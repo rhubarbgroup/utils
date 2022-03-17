@@ -126,8 +126,6 @@ curl "https://objectcache.pro/plugin/object-cache-pro${version}.zip?token=${toke
 
 echo "Unpacking archive..."
 
-
-exit 0
 unzip -q "$tmpdir/object-cache-pro.zip" -d "$tmpdir"
 rm "$tmpdir/object-cache-pro.zip"
 
