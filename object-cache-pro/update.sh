@@ -146,4 +146,12 @@ $wpcli eval 'opcache_reset();' --skip-plugins --skip-themes --path=$wp
 
 echo "Completed update."
 
+if [ -d "$mudir/redis-cache-pro" ]; then
+  echo "Deleting old must-use plugin files..."
+  rm -rf $mudir/redis-cache-pro
+fi
+
+echo "Deleting temporay files..."
+rm -rf $tmpdir
+
 echo "Done."
