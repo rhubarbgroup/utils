@@ -79,16 +79,34 @@ if [ ! -d "$wp" ]; then
   exit 1
 fi
 
-echo "Detecting WordPress..."
-
-wpver=$($wpcli eval 'global $wp_version; echo $wp_version;' --skip-plugins --skip-themes --path=$wp)
-echo "Found WordPress: ${wpver}"
+echo "Preparing for update..."
 
 mudir=$($wpcli eval 'echo WPMU_PLUGIN_DIR;' --skip-plugins --skip-themes --path=$wp)
-echo "Found mu-plugin path: ${mudir}"
+echo "Detected must-use plugin directory: ${mudir}"
 
 if [ ! -w "$mudir" ]; then
   echo -e "${LOGERR} Must-use plugin directory is not a writable as $USER." >&2
+  exit 1
+fi
+
+diagnostics=$(cat <<\END
+  if (isset($GLOBALS['ObjectCachePro'])) {
+    $diagnostics = $GLOBALS['ObjectCachePro']->diagnostics();
+    echo (int) ($diagnostics->dropinExists() && $diagnostics->dropinIsValid());
+  } else {
+    echo 0;
+  }
+END
+)
+
+dropin=$($wpcli eval "${diagnostics}" --skip-plugins --skip-themes --path=$wp)
+
+if [ "$dropin" != "1" ]; then
+  echo "Detected valid object cache drop-in"
+elif [ "$dropin" != "0" ]; then
+  echo "Detected foreign object cache drop-in"
+else
+  echo -e "${LOGERR} Failed to detect drop-in status." >&2
   exit 1
 fi
 
