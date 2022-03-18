@@ -2,16 +2,12 @@
 
 ## Object Cache Pro
 
-### Installation
-
-...
-
 ### Update
 
 Update Object Cache Pro must-use plugin installation.
 
 ```
-./update.sh \
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/rhubarbgroup/utils/main/object-cache-pro/update.sh)" - \
   --version=1.14.4 \
   --token=... \
   --source=/home/code \
